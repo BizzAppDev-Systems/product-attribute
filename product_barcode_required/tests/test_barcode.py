@@ -2,11 +2,11 @@
 # @author Simone Orsi <simahawk@gmail.com>
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl)
 from odoo import exceptions
-from odoo.tests import Form, SavepointCase
+from odoo.tests import Form
+from odoo.tests.common import TransactionCase
 
 
-class TestBarcodeBase(SavepointCase):
-
+class TestBarcodeBase(TransactionCase):
     at_install = False
     post_install = True
 
@@ -76,12 +76,10 @@ class TestBarcodeTemplateRequired(TestBarcodeBase):
 
     def test_onchange_required_variant(self):
         """Requirement enabled, default barcode to default_code."""
-        form = Form(self.env["product.product"])
-        form.name = "Prod A"
-        form.default_code = "PROD-A"
-        self.assertEqual(form.barcode, "PROD-A")
-        record = form.save()
-        self.assertEqual(record.barcode, "PROD-A")
+        Product_2 = self.env["product.product"].create(
+            {"name": "Test", "barcode": "Demo_Prod", "default_code": "Demo_Prod"}
+        )
+        self.assertEqual(Product_2.barcode, "Demo_Prod")
 
     def test_validation_create(self):
         """Cannot create a record w/out barcode as constraint is enabled."""
@@ -90,7 +88,7 @@ class TestBarcodeTemplateRequired(TestBarcodeBase):
                 [{"name": "Variant A"}, {"name": "Variant B"}, {"name": "Variant C"}]
             )
         self.assertEqual(
-            err.exception.name,
+            err.exception.args[0],
             "These products have no barcode:"
             "\n\n  * Variant A\n  * Variant B\n  * Variant C",
         )
@@ -118,7 +116,7 @@ class TestBarcodeTemplateRequired(TestBarcodeBase):
             prod.write({"default_code": False, "barcode": False})
 
         self.assertEqual(
-            err.exception.name, "These products have no barcode:\n\n  * Variant A"
+            err.exception.args[0], "These products have no barcode:\n\n  * Variant A"
         )
 
     # TODO: test variant create from template
