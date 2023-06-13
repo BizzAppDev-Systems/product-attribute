@@ -3,7 +3,7 @@
 from odoo.tests import Form, common
 
 
-class TestProductSupplierinfoStockPickingType(common.SavepointCase):
+class TestProductSupplierinfoStockPickingType(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
