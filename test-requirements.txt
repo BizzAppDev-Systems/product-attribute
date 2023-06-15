@@ -1,1 +1,1 @@
-odoo-test-helper
+odoo-addon-product_weight @ git+https://github.com/OCA/product-attribute.git@refs/pull/1280/head#subdirectory=setup/product_weight
