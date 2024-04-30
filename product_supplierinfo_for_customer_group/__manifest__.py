@@ -3,7 +3,7 @@
     "Supplierinfo Group compatibility",
     "summary": "Fixes compatibility of product_supplierinfo_for_customer "
     "and product_supplierinfo_group",
-    "version": "14.0.1.0.0",
+    "version": "15.0.1.0.0",
     "author": "Ilyas, Ooops404, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/product-attribute",
     "category": "Sales Management",
