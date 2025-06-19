@@ -10,6 +10,7 @@ msgstr ""
 "PO-Revision-Date: 2025-06-19 08:58+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -123,6 +124,7 @@ msgid "Import Criteria Field"
 msgstr "Campo de criterio de importación"
 
 #. module: product_supplierinfo_import_by_barcode
+#: model:ir.model.fields,field_description:product_supplierinfo_import_by_barcode.field_product_customerinfo__import_status
 #: model:ir.model.fields,field_description:product_supplierinfo_import_by_barcode.field_product_supplierinfo__import_status
 msgid "Import Status"
 msgstr "Estado de importación"
@@ -170,6 +172,7 @@ msgid "Name"
 msgstr "Nombre"
 
 #. module: product_supplierinfo_import_by_barcode
+#: model:ir.model.fields.selection,name:product_supplierinfo_import_by_barcode.selection__product_customerinfo__import_status__new_or_updated
 #: model:ir.model.fields.selection,name:product_supplierinfo_import_by_barcode.selection__product_supplierinfo__import_status__new_or_updated
 msgid "New or Updated"
 msgstr "Nuevo o actualizado"
@@ -263,8 +266,7 @@ msgstr ""
 
 #. module: product_supplierinfo_import_by_barcode
 #: model:ir.model.fields,help:product_supplierinfo_import_by_barcode.field_product_supplierinfo_import_template__sheet_number
-msgid ""
-"The number of the sheet page in the spreadsheet where the pricelist are"
+msgid "The number of the sheet page in the spreadsheet where the pricelist are"
 msgstr ""
 "El número de la hoja en la hoja de cálculo donde se encuentran las tarifas"
 
@@ -281,6 +283,7 @@ msgid "This product was created with the vendor import wizard"
 msgstr "Este producto se ha creado con el importador de tarifas de proveedor"
 
 #. module: product_supplierinfo_import_by_barcode
+#: model:ir.model.fields.selection,name:product_supplierinfo_import_by_barcode.selection__product_customerinfo__import_status__unchanged
 #: model:ir.model.fields.selection,name:product_supplierinfo_import_by_barcode.selection__product_supplierinfo__import_status__unchanged
 msgid "Unchanged"
 msgstr "Sin cambios"
