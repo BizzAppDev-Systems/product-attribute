@@ -64,8 +64,9 @@ class ProductSupplierInfoImportTemplateLine(models.Model):
 
     template_id = fields.Many2one(comodel_name="product.supplierinfo.import.template")
     header_name = fields.Text(
-        help="Copy it directly from the origin cell so it matches right"
+        required=True, help="Copy it directly from the origin cell so it matches right"
     )
     field_id = fields.Many2one(
-        comodel_name="ir.model.fields", domain=[("model", "=", "product.supplierinfo")]
+        comodel_name="ir.model.fields",
+        domain=[("model", "=", "product.supplierinfo"), ("store", "=", True)],
     )

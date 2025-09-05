@@ -37,7 +37,7 @@
         id="product_supplierinfo_import_menu"
         name="Import vendor pricelists"
         parent="purchase.menu_purchase_config"
-        action="product_supplierinfo_import_by_barcode.product_supplierinfo_import_action"
+        action="product_supplierinfo_import.product_supplierinfo_import_action"
         groups="base.group_user"
     />
 </odoo>

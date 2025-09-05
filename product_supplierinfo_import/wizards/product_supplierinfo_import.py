@@ -27,8 +27,8 @@ class ProductSupplierInfoImport(models.TransientModel):
     date_start = fields.Date(string="Validity", required=True)
     delay = fields.Integer()
     create_new_products = fields.Boolean(
-        help="If a product isn't found by its Search Field, it will be created with the "
-        "provided data",
+        help="If a product isn't found by its Search Field, it will be created with "
+        "the provided data",
         default=True,
     )
     supplierinfo_file = fields.Binary(required=True)
@@ -54,7 +54,13 @@ class ProductSupplierInfoImport(models.TransientModel):
                     "2.0"
                 ) or not filename.lower().endswith(".xlsx"):
                     raise UserError(_("Only .xlsx files are supported."))
-                data = base64.b64decode(record.supplierinfo_file)
+                # Check if supplierinfo_file looks like a valid base64 string
+                # before decoding
+                try:
+                    data = base64.b64decode(record.supplierinfo_file)
+                except Exception:
+                    record.template_id = False
+                    continue
                 workbook = xlrd.open_workbook(file_contents=data)
                 record._detect_template(workbook)
             else:
@@ -114,7 +120,9 @@ class ProductSupplierInfoImport(models.TransientModel):
             parsed_data.append(
                 {
                     header: value
-                    for header, value in zip(header_values, row_values(sheet.row(nrow)))
+                    for header, value in zip(
+                        header_values, row_values(sheet.row(nrow)), strict=False
+                    )
                 }
             )
         return parsed_data
@@ -207,7 +215,7 @@ class ProductSupplierInfoImport(models.TransientModel):
         product_data = {
             "created_from_supplierinfo_import": True,
             "name": vendor_product_name,
-            "purchase_ok": False,
+            "purchase_ok": True,
             "sale_ok": False,
             search_field: search_value,
         }
@@ -215,7 +223,6 @@ class ProductSupplierInfoImport(models.TransientModel):
             product = self.env["product.template"].create(product_data)
             product.message_post(
                 body=_("Created from supplier price list import"),
-                type="note",
             )
             return product
         except ValidationError:
@@ -234,7 +241,8 @@ class ProductSupplierInfoImport(models.TransientModel):
     def _create_new_supplierinfo(
         self, previous_supplierinfo, product, row_data, search_field, search_value
     ):
-        """Creates a new supplier price list record, updating the previous one if needed."""
+        """Creates a new supplier price list record, updating the previous one if
+        needed."""
         values = self._prepare_supplierinfo_values(row_data)
         if not values:
             return self.env["product.supplierinfo"]
