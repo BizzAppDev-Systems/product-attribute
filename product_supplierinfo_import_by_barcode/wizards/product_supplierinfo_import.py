@@ -93,6 +93,7 @@ class ProductSupplierInfoImport(models.TransientModel):
 
     def _parse_sheet(self, data):
         """Extract the data and apply the import logic"""
+
         # Avoid cells with numbers which aren't decimals but end being rendered as
         # floats when passed to strings
         def row_values(row):
