@@ -11,9 +11,15 @@ class TestProductRouteMto(TransactionCase):
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         cls.route_mto = cls.env.ref("stock.route_warehouse0_mto")
         cls.route_mto.active = True
+        cls.product_category = cls.env["product.category"].create(
+            {
+                "name": "Test Category",
+            }
+        )
         cls.product = cls.env["product.template"].create(
             {
                 "name": "Product Test",
+                "categ_id": cls.product_category.id,
             }
         )
 
