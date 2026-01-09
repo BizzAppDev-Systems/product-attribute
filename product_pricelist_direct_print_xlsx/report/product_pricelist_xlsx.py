@@ -103,17 +103,16 @@ class ProductPricelistXlsx(models.AbstractModel):
         }
 
     def _prepare_header_row(self, book):
-        _ = self.env._
-        row = [_("Description")]
+        row = [self.env._("Description")]
         if book.show_internal_category:
-            row.append(_("Internal Category"))
+            row.append(self.env._("Internal Category"))
         if book.show_standard_price:
-            row.append(_("Cost Price"))
+            row.append(self.env._("Cost Price"))
         if book.show_sale_price:
-            row.append(_("Sale Price"))
-        row.append(_("List Price"))
+            row.append(self.env._("Sale Price"))
+        row.append(self.env._("List Price"))
         if book.show_product_uom:
-            row.append(_("UoM"))
+            row.append(self.env._("UoM"))
         return row
 
     def _prepare_data_row_with_formats(self, book, product, formats):
