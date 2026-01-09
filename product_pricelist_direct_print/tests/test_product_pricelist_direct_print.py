@@ -1,7 +1,10 @@
 # Copyright 2017 Carlos Dauden <carlos.dauden@tecnativa.com>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
+from datetime import datetime
+
 from odoo.exceptions import ValidationError
+from odoo.tests import Form
 from odoo.tests.common import TransactionCase, tagged
 
 from odoo.addons.base.tests.common import DISABLED_MAIL_CONTEXT
@@ -123,7 +126,7 @@ class TestProductPricelistDirectPrint(TransactionCase):
                             "name": self.product.name,
                             "product_id": self.product.id,
                             "product_uom_qty": 10.0,
-                            "product_uom": self.product.uom_id.id,
+                            "product_uom_id": self.product.uom_id.id,
                             "price_unit": 1000.00,
                         },
                     ),
@@ -134,7 +137,7 @@ class TestProductPricelistDirectPrint(TransactionCase):
                             "name": product2.name,
                             "product_id": product2.id,
                             "product_uom_qty": 10.0,
-                            "product_uom": product2.uom_id.id,
+                            "product_uom_id": product2.uom_id.id,
                             "price_unit": 300.00,
                         },
                     ),
@@ -212,3 +215,88 @@ class TestProductPricelistDirectPrint(TransactionCase):
             "product_pricelist_direct_print.report_product_pricelist", wiz.ids
         )
         self.assertGreaterEqual(len(report_pdf[0]), 1)
+
+    def test_compute_print_child_categories(self):
+        """
+        Test that child categories are not printed when no category is chosen,
+        and are printed when a category is selected.
+        """
+        wiz_form = Form(self.wiz_obj)
+        self.assertFalse(
+            wiz_form.print_child_categories,
+            "Child categories should NOT print if category is not selected",
+        )
+        wiz_form.partner_ids.add(self.partner)
+        wiz_form.categ_ids.add(self.category)
+        wiz = wiz_form.save()
+        self.assertTrue(
+            wiz.print_child_categories,
+            "Child categories should be printed when at least one category is selected",
+        )
+
+    def test_compute_product_price_vat_excl(self):
+        """Test that price is correct without taxes(VAT excluded)."""
+        wiz = self.wiz_obj.with_context(product=self.product).create(
+            {
+                "pricelist_id": self.pricelist.id,
+                "vat_mode": "vat_excl",
+                "date": datetime.now(),
+            }
+        )
+        wiz.write({"vat_mode": "vat_excl"})
+        expected_price = self.product.taxes_id.compute_all(
+            wiz.get_pricelist_to_print()._get_product_price(
+                self.product, 1, date=wiz.date
+            )
+        )["total_excluded"]
+        self.assertEqual(
+            wiz.product_price,
+            expected_price,
+            "Price should match the expected value without taxes",
+        )
+
+    def test_compute_product_price_vat_incl(self):
+        """Test that price is correct with taxes(VAT included)."""
+        wiz = self.wiz_obj.with_context(product=self.product).create(
+            {
+                "pricelist_id": self.pricelist.id,
+                "vat_mode": "vat_incl",
+                "date": datetime.now(),
+            }
+        )
+        wiz.write({"vat_mode": "vat_incl"})
+        expected_price = self.product.taxes_id.compute_all(
+            wiz.get_pricelist_to_print()._get_product_price(
+                self.product, 1, date=wiz.date
+            )
+        )["total_included"]
+        self.assertEqual(
+            wiz.product_price,
+            expected_price,
+            "Price should match the expected value including taxes",
+        )
+
+    def test_default_get_product_items(self):
+        """Test that selected product appears and variants are shown."""
+        item = self.pricelist.item_ids.create(
+            {
+                "pricelist_id": self.pricelist.id,
+                "applied_on": "0_product_variant",
+                "product_id": self.product.id,
+                "compute_price": "fixed",
+                "fixed_price": 100.0,
+            }
+        )
+        ctx = {"active_model": "product.pricelist.item", "active_ids": [item.id]}
+        wiz = self.wiz_obj.with_context(**ctx).new()
+        res = wiz.default_get([])
+
+        self.assertTrue(
+            res.get("show_variants"),
+            ("Variants should be shown for selected products"),
+        )
+        self.assertIn(
+            self.product.id,
+            res.get("product_ids")[0][2],
+            ("The selected product should appear in the product list"),
+        )
